@@ -1,34 +1,42 @@
 
 <?php
-session_start();
-if(isset($_SESSION['status']) && $_SESSION['status'] == true ){
-    header("Location:home.php");
-}
+    include 'includes/vars.inc.php';
+    include 'includes/connect.inc.php';
 
-$message="";
-if(isset($_POST["submit"])){
-    if(!empty($_POST["email"]) && !empty($_POST["password"])){
-        $connection = mysql_connect("localhost","root","") or die(mysql_error());
-        $db = mysql_select_db("php_login_logout") or die("cannot select DB");
-        $email = $_POST["email"];
-        $password=$_POST["password"];
-       
-        $query = mysql_query("SELECT * FROM userData WHERE email = '{$email}' AND password='{$password}'");
-
-        $row = mysql_num_rows($query);
-
-        if($row==true){
-
-            $_SESSION["status"] = true;
-            header("Location:home.php");
-        }
-        else{
-            $message = "Sorry, your credentials are not valid, Please try again."; 
-        }
-    }else{
-        $message =  "pls enter all the inputs";
+    if(isset($_SESSION['status']) && $_SESSION['status'] == true ){
+        header("Location:home.php");
     }
-}
+    
+    $message="";
+    if(isset($_POST["submit"])){
+        if(!empty($_POST["email"]) && !empty($_POST["password"])){
+            $pemail = $_POST["email"];
+            $ppassword=$_POST["password"];
+            //Query
+            $sql = "SELECT * FROM user_table WHERE `email` = '{$pemail}'";
+            $result = $pdo->query($sql);
+            $rowNo = $result->rowCount();
+            if($rowNo == 1){
+                $row = $result->fetch();
+                $id = $row['id'];
+                $email = $row['email'];
+                $name = $row['name'];
+                $password = $row['password'];
+                if($ppassword == $password){
+                    $_SESSION["status"] = true;
+                    $_SESSION['name'] = $name;
+                    header("Location:home.php");
+                }else{
+                    $message = "You Forgot the Password, Seriously!, I am done with you Civilian. I need to start Civil War.";
+                }
+                                
+            }else{
+                $message = "No User with this email registered.";
+            }
+        }else{
+            $message =  "Hey Civilian, Enter all the inputs";
+        }
+    }
 ?>
 
 
@@ -50,6 +58,7 @@ if(isset($_POST["submit"])){
 
   <!-- Custom styles for this template-->
   <link href="css/sb-admin-2.min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
 
 </head>
 
@@ -69,8 +78,10 @@ if(isset($_POST["submit"])){
 
               <div class="col-lg-12">
                 <div class="p-5">
-                  <div class="text-center">
-                    <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
+                  <div class="text-center logodiv mb-4">
+                    <h1 class="h4 text-white mb-4">
+                        <img src="https://res-3.cloudinary.com/crunchbase-production/image/upload/c_lpad,h_256,w_256,f_auto,q_auto:eco/vtvzv6byyjpyo6dayrvt" style="height: 35px;"> x <img src="https://asset21.ckassets.com/themes/ck-storepage-v2/img/logo_v6.png" style="height: 25px;">
+                    </h1>
                   </div>
                   <form class="user" action="" method="POST">
                     <div class="form-group">
@@ -84,15 +95,10 @@ if(isset($_POST["submit"])){
                     <div>
                     <button  type="submit" name="submit" class="btn btn-primary btn-user btn-block">Login</buttton>
                     </div>
-                     <hr>
-
                   </form>
                   <hr>
                   <div class="text-center">
-                    <a class="small" href="forgot-password.html">Forgot Password?</a>
-                  </div>
-                  <div class="text-center">
-                    <a class="small" href="register.html">Create an Account!</a>
+                    <p class="text-danger"><?php echo $message; ?></p>
                   </div>
                 </div>
               </div>
