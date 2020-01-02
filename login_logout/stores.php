@@ -8,10 +8,6 @@ if($_SESSION['status'] != true){
 $sql = "SELECT * FROM store_table";
 $result = $pdo->query($sql);
 $rowNo = $result->rowCount();
-$arr_store=[];
-if($rowNo > 0){
-    $arr_store = $result;
-}
 ?>
 <head>
 
@@ -79,12 +75,12 @@ if($rowNo > 0){
                     </tr>
                   </thead>
                   <?php
-                 while($row=mysqli_fetch_array($result)){
+                 while($row = $result->fetch()){
                      echo '
                      <tr>
                         <td>'. $row['sid'].'</td>
                         <td>'. $row['name'].'</td>
-                        <td>'.$row['storage_image_url'] .'</td>
+                        <td>'.$row['store_image_url'] .'</td>
                         
                      </tr>
                      ';
